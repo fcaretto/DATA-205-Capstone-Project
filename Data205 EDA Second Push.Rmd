@@ -63,6 +63,8 @@ summary(HLR)
 ```
 
 
+## Create a new data frame for the MPDU dataset showing just Total Units and Total MPDU, grouped by Planning Area.
+
 ```{r}
 MPDU$Total.Units <- as.numeric(MPDU$Total.Units)
 MPDU$Total.MPDU <- as.numeric(MPDU$Total.MPDU)
@@ -71,13 +73,27 @@ select(Planning.Area, Total.Units, Total.MPDU) %>%
 group_by(Planning.Area)
 MPDU3
 ```
+
+### Drop the NAs from this new data frame.
+
 ```{r}
 MPDU4 <- drop_na(MPDU3)
 ```
+
+### Create a new dataframe showing the sums of Total Unit and Total MPDU columns grouped by Planning Area.
 
 ```{r}
 MPDU5 <- MPDU4 %>% 
     summarize_if(is.numeric, sum)
 MPDU5
+```
+
+### Create a new data frame with variables of interest from the HLR dataset: Ownership Type, Property City, Structure Type, Unit Count, and License Type.
+
+```{r}
+HLR3 <- HLR %>% 
+select(Ownership.Type, Property.City, Structure.Type, Unit.Count, License.Type) %>%
+group_by(Property.City)
+HLR3
 ```
 
