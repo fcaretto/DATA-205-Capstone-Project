@@ -1,0 +1,66 @@
+---
+title: "Data204 EDA 3.24"
+output: html_document
+---
+
+## Load data
+### Read in two dataMontgomery datasets: "Moderately Priced Dwelling Units" and "Housing Licensing and Registration"
+### Install necessary packages for data cleaning, wrangling, and visualizing: tidyverse and ggplot2.
+
+```{r}
+MPDU <- read.csv("https://data.montgomerycountymd.gov/api/views/pbh5-g4e5/rows.csv?accessType=DOWNLOAD")
+HLR <- read.csv("https://data.montgomerycountymd.gov/api/views/et5s-xste/rows.csv?accessType=DOWNLOAD")
+install.packages("tidyverse")
+install.packages("ggplot2")
+library("tidyverse")
+library("ggplot2")
+```
+
+
+## Look at the structure of the MPDU dataset.
+
+```{r}
+str(MPDU)
+```
+
+### Look at the head and tail of the MPDU dataset.
+
+```{r}
+head(MPDU)
+tail(MPDU)
+```
+
+### Create new versions of the datasets without NAs.
+
+```{r}
+MPDU2 <- drop_na(MPDU)
+HLR2 <- drop_na(HLR)
+```
+
+
+### Take a look at the summary of the MPDU dataset.
+
+```{r}
+summary(MPDU)
+```
+
+
+### Look at the structure, head, and tail of the HLR dataset.
+
+```{r}
+str(HLR)
+head(HLR)
+tail(HLR)
+```
+
+
+
+
+### Take a look at the summary of the HLR dataset.
+
+```{r}
+summary(HLR)
+```
+
+
+
