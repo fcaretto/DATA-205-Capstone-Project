@@ -97,3 +97,26 @@ group_by(Property.City)
 HLR3
 ```
 
+
+## Read in 2019 High School Completion dataset.
+
+```{r}
+url <- "https://reportcard.msde.maryland.gov/DataDownloads/FileDownload/403"
+download.file(url, "2019_High_School_Completion.zip")
+unzip("2019_High_School_Completion.zip")
+HS_Completion19 <- read.csv("2019_High_School_Completion.csv")
+
+```
+
+
+## Read in Students Receiving Special Services 2019 dataset.
+
+```{r}
+url2 <- "https://reportcard.msde.maryland.gov/DataDownloads/FileDownload/378"
+download.file(url2, "Special_Services_2019.zip")
+unzip("Special_Services_2019.zip")
+SS19 <- read.csv("Special_Services_2019.csv")
+```
+
+
+
