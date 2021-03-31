@@ -98,17 +98,6 @@ HLR3
 ```
 
 
-## Read in 2019 High School Completion dataset.
-
-```{r}
-url <- "https://reportcard.msde.maryland.gov/DataDownloads/FileDownload/403"
-download.file(url, "2019_High_School_Completion.zip")
-unzip("2019_High_School_Completion.zip")
-HS_Completion19 <- read.csv("2019_High_School_Completion.csv")
-
-```
-
-
 ## Read in Students Receiving Special Services 2019 dataset.
 
 ```{r}
@@ -119,4 +108,21 @@ SS19 <- read.csv("Special_Services_2019.csv")
 ```
 
 
+## Read in Cohort Graduation Rates 2019 dataset.
+
+```{r}
+url3 <- "https://reportcard.msde.maryland.gov/DataDownloads/FileDownload/390"
+download.file(url3, "Cohort_Graduation_and_Dropout_Rates_2019.zip")
+unzip("Cohort_Graduation_and_Dropout_Rates_2019.zip")
+Grad19 <- read.csv("Cohort_Grad_Rate_2019.csv")
+```
+
+## Read in Low-Income Housing Tax Credit dataset.
+
+```{r}
+url4 <- "https://lihtc.huduser.gov/lihtcpub.zip"
+download.file(url4, "lihtcpub.zip")
+unzip("lihtcpub.zip")
+LIHTC <- read.csv("LIHTCPUB.csv")
+```
 
