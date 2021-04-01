@@ -156,6 +156,46 @@ unzip("Cohort_Graduation_and_Dropout_Rates_2019.zip")
 Grad19 <- read.csv("Cohort_Grad_Rate_2019.csv")
 ```
 
+## Read in Cohort Graduation Rates 2018 dataset.
+
+```{r}
+url9 <- "https://reportcard.msde.maryland.gov/DataDownloads/FileDownload/354"
+download.file(url9, "Cohort_Graduation_and_Dropout_Rates_2018.zip")
+unzip("Cohort_Graduation_and_Dropout_Rates_2018.zip")
+Grad18 <- read.csv("Cohort_Grad_Rate_2018.csv")
+```
+
+
+## Read in Cohort Graduation Rates 2017 dataset.
+
+```{r}
+url10 <- "https://reportcard.msde.maryland.gov/DataDownloads/FileDownload/326"
+download.file(url10, "Cohort_Grad_Rate_2017.zip")
+unzip("Cohort_Grad_Rate_2017.zip")
+Grad17 <- read.csv("Cohort_Grad_Rate_2017.csv")
+```
+
+
+## Read in Cohort Graduation Rates 2016 dataset.
+
+```{r}
+url11 <- "https://reportcard.msde.maryland.gov/DataDownloads/FileDownload/302"
+download.file(url11, "Cohort_Grad_Rate_2016.zip")
+unzip("Cohort_Grad_Rate_2016.zip")
+Grad16 <- read.csv("Cohort_Grad_Rate_2016.csv")
+```
+
+
+## Read in Cohort Graduation Rates 2015 dataset.
+
+```{r}
+url12 <- "https://reportcard.msde.maryland.gov/DataDownloads/FileDownload/262"
+download.file(url12, "Cohort_Grad_Rate_2015.zip")
+unzip("Cohort_Grad_Rate_2015.zip")
+Grad15 <- read.csv("Cohort_Grad_Rate_2015.csv")
+```
+
+
 ## Read in Low-Income Housing Tax Credit dataset.
 
 ```{r}
@@ -163,5 +203,85 @@ url4 <- "https://lihtc.huduser.gov/lihtcpub.zip"
 download.file(url4, "lihtcpub.zip")
 unzip("lihtcpub.zip")
 LIHTC <- read.csv("LIHTCPUB.csv")
+```
+
+
+## Create two data frames: one for MCPS and one for PGCPS with the names of all their respective High Schools with their corresponding zip codes.
+
+```{r}
+MCPS <- data.frame(
+  MCPS_name = c("Stephen Knolls School", "Longview School", "Montgomery Blair High", "Northwest High", "Walter Johnson High", "Richard Montgomery High", "Gaithersburg High", "Clarksburg High", "Winston Churchill High", "Bethesda-Chevy Chase High", "Quince Orchard High", "Thomas S. Wootton High", "Walt Whitman High", "Wheaton High", "Sherwood High", "Paint Branch High", "John F. Kennedy High", "Albert Einstein High", "Northwood High", "Springbrook High", "James Hubert Blake High", "Watkins Mill High", "Col. Zadok Magruder High", "Rockville High", "Damascus High", "Poolesville High", "Seneca Valley High", "Alternative Programs", "John L Gildner Regional Inst for Children & Adol", "Rock Terrace School"),
+  MCPS_zip = c(20895, 20874, 20901, 20874, 20814, 20852, 20877, 20871, 20854, 20814, 20878, 20850, 20817, 20906, 20860, 20866, 20902, 20895, 20901, 20904, 20905, 20879, 20855, 20851, 20872, 20837, 20874, 20853, 20850, 20850)
+)
+PGCPS = data.frame(
+  PGCPS_name = c("Eleanor Roosevelt High","High Point High","Bowie High","Parkdale High","Northwestern High","Dr. Henry A. Wise, Jr. High","Charles Herbert Flowers High","Duval High","Suitland High","Bladensburg High","Laurel High","Oxon Hill High","Potomac High","Frederick Douglass High","Crossland High","Gwynn Park High","Largo High","Central High","Friendly High","Fairmont Heights High","Surrattsville High","Academy of Health Sciences at PGCC","Chesapeake Math and IT Public Charter","International High school @ Largo","Northwestern Evening/Saturday High","International High School @ Langley Park","Chesapeake Math and IT South Public Charter","College Park Academy","Crossland Evening/Saturday High","Tall Oaks High","Croom High","Community Based Classrooms","C. Elizabeth Rieg Regional Center","James E. Duckworth Regional Center"),
+  PGCPS_zip = c(20770, 20705, 20715, 20737, 20782, 20772, 20774, 20706, 20746, 20710, 20707, 20745, 20745, 20772, 20748, 20613, 20774, 20747, 20744, 20785, 20735, 20774, 20707, 20772, 20782, 20710, 20772, 20737, 20748, 20721, 20623, 20710, 20716, 20705)
+)
+MCPS
+PGCPS
+```
+
+## Rename the Class.of.Year column in Grad15 dataset to match the rest of the Graduation Rate datasets.
+
+```{r}
+Grad15 <- Grad15 %>% 
+  rename(Academic.Year = Class.of.Year)
+```
+
+## Rename the Class.of.Year column in Grad16 dataset to match the rest of the Graduation Rate datasets.
+
+```{r}
+Grad16 <- Grad16 %>% 
+  rename(Academic.Year = Class.of.Year)
+```
+
+
+## Rename more columns in Graduation Rates datasets to match the rest of them.
+
+```{r}
+Grad17 <- Grad17 %>%
+  rename(LEA = LEA.Number)
+Grad18 <- Grad18 %>%
+  rename(LEA = LSS.Number, LEA.Name = LSS.Name)
+Grad19 <- Grad19 %>%
+  rename(LEA = LSS.Number, LEA.Name = LSS.Name)
+```
+
+## Combine all Graduation Rates datasets into one Total Graduation Rate dataset.
+
+```{r}
+Total_Grad <- rbind(Grad15, Grad16, Grad17, Grad18, Grad19)
+```
+
+## Rename some columns to match the other Students Receiving Special Services datasets and then create new datasets pulling in only the variables I am interested in.
+
+```{r}
+SS15_2 <- SS15 %>% 
+select(Academic.Year, LEA.Name, School.Name, School.Type, FARMS.Pct, FARMS.Cnt, Enrollment.Cnt)
+SS15_2
+
+SS16_2 <- SS16 %>% 
+select(Academic.Year, LEA.Name, School.Name, School.Type, FARMS.Pct, FARMS.Cnt, Enrollment.Cnt)
+SS16_2
+
+SS17_2 <- SS17 %>% 
+select(Academic.Year, LEA.Name, School.Name, School.Type, FARMS.Pct, FARMS.Cnt, Enrollment.Cnt)
+SS17_2
+
+SS18_2 <- SS18 %>% 
+  rename(LEA.Name = LSS.Name) %>%
+  select(Academic.Year, LEA.Name, School.Name, School.Type, FARMS.Pct, FARMS.Cnt, Enrollment.Cnt)
+SS18_2
+
+SS19_2 <- SS19 %>% 
+  rename(LEA.Name = LSS.Name) %>%
+  select(Academic.Year, LEA.Name, School.Name, School.Type, FARMS.Pct, FARMS.Cnt, Enrollment.Cnt)
+SS19_2
+```
+
+## Combine all Students Receiving Special Services datasets into one Total Special Services dataset.
+
+```{r}
+Total_SS <- rbind(SS15_2, SS16_2, SS17_2, SS18_2, SS19_2)
 ```
 
