@@ -92,7 +92,7 @@ MPDU5
 
 ```{r}
 HLR3 <- HLR %>% 
-select(Ownership.Type, Property.City, Structure.Type, Unit.Count, License.Type) %>%
+select(Ownership.Type, Property.City, Property.Zip.Code, Structure.Type, Unit.Count, License.Type) %>%
 group_by(Property.City)
 HLR3
 ```
@@ -283,5 +283,93 @@ SS19_2
 
 ```{r}
 Total_SS <- rbind(SS15_2, SS16_2, SS17_2, SS18_2, SS19_2)
+```
+
+
+## Count NAs for Total_SS and Total_Grad datasets
+
+```{r}
+summary(Total_Grad)
+```
+
+```{r}
+summary(Total_SS)
+```
+
+### Great, there are no NAs that need to be removed.
+
+## Create a new Total_Grad dataset with only Montgomery and Prince George's county. Then compare graduation rates for MCPS and PGCPS high schools from 2015-2019.
+
+```{r}
+Total_Grad_MCPS_PGCPS <- subset(Total_Grad, LEA.Name == "Montgomery" & Cohort == "4-year adjusted cohort" | LEA.Name == "Prince George's" & Cohort == "4-year adjusted cohort")
+```
+
+
+```{r}
+Total_Grad_MCPS_PGCPS$Grad.Rate <- as.numeric(Total_Grad_MCPS_PGCPS$Grad.Rate)
+```
+
+```{r}
+summary(Total_Grad_MCPS_PGCPS)
+```
+
+
+### Find the mean graduation rates by county.
+
+```{r}
+mean_grad <- drop_na(Total_Grad_MCPS_PGCPS) %>%
+select(LEA.Name, Grad.Rate) %>%
+group_by(LEA.Name) %>%
+summarise_all(funs(mean))
+mean_grad
+```
+### Make a visualization for graduation rates by county from 2015-2019.
+
+```{r}
+plot1<- ggplot(data=Total_Grad_MCPS_PGCPS, aes(x=Academic.Year, y=Grad.Rate, group=LEA.Name)) +
+  geom_boxplot()
+plot1
+```
+
+
+```{r}
+summary(HLR3)
+```
+
+```{r}
+HLR3$Property.Zip.Code <- as.numeric(HLR3$Property.Zip.Code)
+```
+
+
+```{r}
+summary(HLR3)
+```
+
+```{r}
+HOC_zip <- aggregate(HLR3$Unit.Count, by=list(Category=HLR3$Property.Zip.Code, HLR3$Ownership.Type), FUN=sum)
+HOC_zip
+```
+```{r}
+HOC_zip %>% 
+  subset(Group.2=='Housing Opportunities Community') %>%
+  arrange(desc(x))%>%
+  head(10)
+```
+
+
+```{r}
+plot2 <- HOC_zip %>% 
+  subset(Group.2=='Housing Opportunities Community') %>%
+  arrange(desc(x))%>%
+  head(10)%>%
+ggplot(HOC_zip, mapping = aes(x=Category, y=x, color=Group.2)) +
+  geom_bar(stat="identity", fill="white")
+plot2
+```
+
+
+
+```{r}
+MCPS_top10_HOC <- MCPS$MCPS_zip == 20886 | 20814| 20910| 20902| 20874| |20904
 ```
 
