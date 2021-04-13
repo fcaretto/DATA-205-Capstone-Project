@@ -3,8 +3,12 @@ title: "DATA205 EDA"
 output: html_document
 ---
 
-## Load data
-### Read in two dataMontgomery datasets: "Moderately Priced Dwelling Units" and "Housing Licensing and Registration"
+# Exploratory Data Analysis (EDA)
+
+## Begin to load in the data
+
+### Read in two dataMontgomery datasets: "Moderately Priced Dwelling Units" (named as "MPDU") and "Housing Licensing and Registration" (named as "HLR")
+
 ### Install necessary packages for data cleaning, wrangling, and visualizing: tidyverse and ggplot2.
 
 ```{r}
@@ -37,6 +41,13 @@ MPDU2 <- drop_na(MPDU)
 HLR2 <- drop_na(HLR)
 ```
 
+### Actually, I don't want to do this now so I will delete these two new dataframes.
+
+```{r}
+remove(MPDU2)
+remove(HLR2)
+```
+
 
 ### Take a look at the summary of the MPDU dataset.
 
@@ -55,7 +66,6 @@ tail(HLR)
 
 
 
-
 ### Take a look at the summary of the HLR dataset.
 
 ```{r}
@@ -68,33 +78,52 @@ summary(HLR)
 ```{r}
 MPDU$Total.Units <- as.numeric(MPDU$Total.Units)
 MPDU$Total.MPDU <- as.numeric(MPDU$Total.MPDU)
-MPDU3 <- MPDU %>% 
+MPDU_Units_MPDU_PA <- MPDU %>% 
 select(Planning.Area, Total.Units, Total.MPDU) %>%
 group_by(Planning.Area)
-MPDU3
+MPDU_Units_MPDU_PA
 ```
+### Remove unused dataframe.
+
+```{r}
+remove(MPDU3)
+```
+
 
 ### Drop the NAs from this new data frame.
 
 ```{r}
-MPDU4 <- drop_na(MPDU3)
+New_MPDU_Units_MPDU_PA <- drop_na(MPDU_Units_MPDU_PA)
 ```
 
-### Create a new dataframe showing the sums of Total Unit and Total MPDU columns grouped by Planning Area.
+### Create a new data frame showing the sums of Total Unit and Total MPDU columns grouped by Planning Area.
 
 ```{r}
-MPDU5 <- MPDU4 %>% 
+MPDU_Sums_PA <- New_MPDU_Units_MPDU_PA %>% 
     summarize_if(is.numeric, sum)
-MPDU5
+MPDU_Sums_PA
 ```
+
+### Remove more unneeded data frames.
+
+```{r}
+remove(MPDU4)
+remove(MPDU5)
+```
+
 
 ### Create a new data frame with variables of interest from the HLR dataset: Ownership Type, Property City, Structure Type, Unit Count, and License Type.
 
 ```{r}
-HLR3 <- HLR %>% 
+HLR_New <- HLR %>% 
 select(Ownership.Type, Property.City, Property.Zip.Code, Structure.Type, Unit.Count, License.Type) %>%
 group_by(Property.City)
-HLR3
+HLR_New
+```
+### Remove unused data frame.
+
+```{r}
+remove(HLR3)
 ```
 
 
@@ -206,7 +235,7 @@ LIHTC <- read.csv("LIHTCPUB.csv")
 ```
 
 
-## Create two data frames: one for MCPS and one for PGCPS with the names of all their respective High Schools with their corresponding zip codes.
+## Create two data frames: one for MCPS and one for PGCPS with the names of every High School and their corresponding zip code.
 
 ```{r}
 MCPS <- data.frame(
@@ -286,7 +315,7 @@ Total_SS <- rbind(SS15_2, SS16_2, SS17_2, SS18_2, SS19_2)
 ```
 
 
-## Count NAs for Total_SS and Total_Grad datasets
+## Count NAs for Total_SS and Total_Grad datasets.
 
 ```{r}
 summary(Total_Grad)
@@ -298,23 +327,28 @@ summary(Total_SS)
 
 ### Great, there are no NAs that need to be removed.
 
-## Create a new Total_Grad dataset with only Montgomery and Prince George's county. Then compare graduation rates for MCPS and PGCPS high schools from 2015-2019.
+## Create a new Total_Grad dataset with only Montgomery and Prince George's counties.
 
 ```{r}
 Total_Grad_MCPS_PGCPS <- subset(Total_Grad, LEA.Name == "Montgomery" & Cohort == "4-year adjusted cohort" | LEA.Name == "Prince George's" & Cohort == "4-year adjusted cohort")
 ```
 
 
+### Convert the Grad.Rate variable into a numeric value.
+
 ```{r}
 Total_Grad_MCPS_PGCPS$Grad.Rate <- as.numeric(Total_Grad_MCPS_PGCPS$Grad.Rate)
 ```
+
+### Take a look at the NAs that were introduced after converting the Grad.Rate variable into a numeric value.
+
 
 ```{r}
 summary(Total_Grad_MCPS_PGCPS)
 ```
 
 
-### Find the mean graduation rates by county.
+### Drop the NAs from the Total_Grad_MCPS_PGCPS data frame and then make a new data frame showing the mean graduation rates by county for all years combined (2015-2019).
 
 ```{r}
 mean_grad <- drop_na(Total_Grad_MCPS_PGCPS) %>%
@@ -323,7 +357,7 @@ group_by(LEA.Name) %>%
 summarise_all(funs(mean))
 mean_grad
 ```
-### Make a visualization for graduation rates by county from 2015-2019.
+### Make a boxplot for graduation rates by county from 2015-2019. Not a great visualization.
 
 ```{r}
 plot1<- ggplot(data=Total_Grad_MCPS_PGCPS, aes(x=Academic.Year, y=Grad.Rate, group=LEA.Name)) +
@@ -331,31 +365,42 @@ plot1<- ggplot(data=Total_Grad_MCPS_PGCPS, aes(x=Academic.Year, y=Grad.Rate, gro
 plot1
 ```
 
+### Look at the summary of our new HLR dataset.
 
 ```{r}
-summary(HLR3)
-```
-
-```{r}
-HLR3$Property.Zip.Code <- as.numeric(HLR3$Property.Zip.Code)
+summary(HLR_New)
 ```
 
 
-```{r}
-summary(HLR3)
-```
+### Convert the Property.Zip.Code variable into a numeric value.
 
 ```{r}
-HOC_zip <- aggregate(HLR3$Unit.Count, by=list(Category=HLR3$Property.Zip.Code, HLR3$Ownership.Type), FUN=sum)
+HLR_New$Property.Zip.Code <- as.numeric(HLR_New$Property.Zip.Code)
+```
+
+### Look again at the summary of the HLR dataset to observe new NAs that were added due to the conversion of the Property.Zip.Code variable into a numeric value.
+
+```{r}
+summary(HLR_New)
+```
+
+
+### Create a new data frame from the HLR dataset showing the total amount of units under each Ownership Type by Property Zip Code.
+
+```{r}
+HOC_zip <- aggregate(HLR_New$Unit.Count, by=list(Category=HLR_New$Property.Zip.Code, HLR_New$Ownership.Type), FUN=sum)
 HOC_zip
 ```
+
+### Find the top 10 zip codes in Montgomery County with the highest total units owned by the Housing Opportunities Community.
+
 ```{r}
 HOC_zip %>% 
   subset(Group.2=='Housing Opportunities Community') %>%
   arrange(desc(x))%>%
   head(10)
 ```
-
+### Visualize this data on a bar plot, showing total amount of units owner by the HOC on the y-axis and zip code on the x-axis. Not a great graphic.
 
 ```{r}
 plot2 <- HOC_zip %>% 
@@ -367,14 +412,19 @@ ggplot(HOC_zip, mapping = aes(x=Category, y=x, color=Group.2)) +
 plot2
 ```
 
+### Take a look at the summary of LIHTC.
+
 ```{r}
 summary(LIHTC)
 ```
 
+### Take a look at the summary of Total_SS.
 
 ```{r}
 summary(Total_SS)
 ```
+
+### Convert the fips2010 variable from the LIHTC dataset into a numeric value. This variable is the FIPS code of the public housing project, which contains the State FIPS code, County FIPS code, and Census Tract number.
 
 ```{r}
 LIHTC$fips2010 <- as.numeric(LIHTC$fips2010)
