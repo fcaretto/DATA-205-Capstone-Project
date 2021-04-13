@@ -367,9 +367,29 @@ ggplot(HOC_zip, mapping = aes(x=Category, y=x, color=Group.2)) +
 plot2
 ```
 
+```{r}
+summary(LIHTC)
+```
 
 
 ```{r}
-MCPS_top10_HOC <- MCPS$MCPS_zip == 20886 | 20814| 20910| 20902| 20874| |20904
+summary(Total_SS)
 ```
 
+```{r}
+LIHTC$fips2010 <- as.numeric(LIHTC$fips2010)
+LIHTC_county <- LIHTC %>%
+  filter((substr(fips2010, 1, 5) == "24031") | (substr(fips2010, 1, 5) == "24033"))
+```
+
+### Find the zip codes in Prince George's County with the top 10 most Low Income Housing Units.
+
+```{r}
+LIHTC_PG_zip <- LIHTC_county %>%
+  filter(substr(fips2010, 1, 5) == "24033") %>%
+  select(latitude, longitude, proj_zip, fips2010, li_units) %>%
+  arrange(desc(li_units))%>%
+  head(20)
+LIHTC_PG_zip
+```
+## The top 10 zip codes in PG county with the most Low Income Housing Units are: 20747, 20785, 20746, 20710, 20706, 20783, 20712, 20737, 20782, 20708. These correlate to the following PGCPS High Schools: Central High School, Fairmont Heights High School, Suitland High School, Bladensburg High School, International High School @ Langley Park, Community Based Classrooms, Duval High School, Parkdale High School, College Park Academy, Northwestern High School, Northwestern Evening/Saturday High School.
