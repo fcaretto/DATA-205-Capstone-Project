@@ -497,3 +497,24 @@ Pearson_Grad_FARMS
 ```
 
 ### This suggests statistically significant correlation with a correlation coefficiant of -0.51.
+
+
+### Create a new column Combining School Names and Academic Year so that there is a unique identifier for each row.
+
+```{r}
+All_Grad_SS$School.By.Year <- paste(All_Grad_SS$School.Name, All_Grad_SS$Academic.Year)
+```
+
+### Convert the All_Grad_SS data frame into a table.
+
+```{r}
+School_Table <- All_Grad_SS %>% remove_rownames %>% column_to_rownames(var="School.By.Year")
+```
+
+### Run a Chi-Squared test on Graduation Rate and FARMS Percentage.
+
+```{r}
+chisq.test(School_Table$Grad.Rate, School_Table$FARMS.Pct, correct = TRUE)
+```
+
+
