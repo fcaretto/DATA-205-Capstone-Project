@@ -487,3 +487,13 @@ All_Grad_SS <- All_Grad_SS %>%
 ```
 
 
+### Run a Pearson Correlation Test on Graduation Rate and FARMS Percentage. First, convert the FARMS Percentage variable into a numeric value.
+
+```{r}
+All_Grad_SS$FARMS.Pct <- as.numeric(All_Grad_SS$FARMS.Pct)
+Pearson_Grad_FARMS <- cor.test(All_Grad_SS$Grad.Rate, All_Grad_SS$FARMS.Pct, 
+                    method = "pearson")
+Pearson_Grad_FARMS
+```
+
+### This suggests statistically significant correlation with a correlation coefficiant of -0.51.
