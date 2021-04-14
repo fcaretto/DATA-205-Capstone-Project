@@ -443,3 +443,47 @@ LIHTC_PG_zip <- LIHTC_county %>%
 LIHTC_PG_zip
 ```
 ## The top 10 zip codes in PG county with the most Low Income Housing Units are: 20747, 20785, 20746, 20710, 20706, 20783, 20712, 20737, 20782, 20708. These correlate to the following PGCPS High Schools: Central High School, Fairmont Heights High School, Suitland High School, Bladensburg High School, International High School @ Langley Park, Community Based Classrooms, Duval High School, Parkdale High School, College Park Academy, Northwestern High School, Northwestern Evening/Saturday High School.
+
+
+### Check the class type of the Graduation Rates data frame.
+
+```{r}
+class(Total_Grad_MCPS_PGCPS)
+```
+### Install and load data.table
+
+```{r}
+install.packages("data.table")           
+library("data.table")
+```
+
+
+### Create a table out of the Graduation Rates data frame.
+
+```{r}
+Total_Grad_Table <- setDT(Total_Grad_MCPS_PGCPS)
+class(Total_Grad_Table)
+```
+
+### Merge the Graduation Rates data frame and Students Receiving Special Services data frame into a full data frame of all the school data.
+
+```{r}
+All_Grad_SS <- merge(Total_Grad_MCPS_PGCPS, Total_SS)
+```
+
+
+### Remove the rows for "All (MCPS/PGCPS) Schools" from the data frame.
+#### These values alter my overall data.
+
+```{r}
+All_Grad_SS <- All_Grad_SS[-c(2, 3, 4, 44, 45, 46), ]
+```
+
+### Filter out Elementary and Middle Schools so we only have High Schools left in our data frame.
+
+```{r}
+All_Grad_SS <- All_Grad_SS %>%
+  filter(substr(School.Type, 1, 4) == "High")
+```
+
+
