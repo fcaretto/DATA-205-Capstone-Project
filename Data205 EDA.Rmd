@@ -476,7 +476,7 @@ All_Grad_SS <- merge(Total_Grad_MCPS_PGCPS, Total_SS)
 #### These values alter my overall data.
 
 ```{r}
-All_Grad_SS <- All_Grad_SS[-c(2, 3, 4, 44, 45, 46), ]
+All_Grad_SS <- All_Grad_SS[-c(2, 3, 4, 44, 45, 46, 89, 90, 91, 171, 172, 173, 130, 131, 132, 258, 259, 260, 261, 212, 213, 214, 305, 306, 307, 308, 354, 355, 356, 357, 402, 403, 404, 405), ]
 ```
 
 ### Filter out Elementary and Middle Schools so we only have High Schools left in our data frame.
@@ -517,4 +517,74 @@ School_Table <- All_Grad_SS %>% remove_rownames %>% column_to_rownames(var="Scho
 chisq.test(School_Table$Grad.Rate, School_Table$FARMS.Pct, correct = TRUE)
 ```
 
+### Incorrect: ran a Chi Squared test on continuous variables.
+
+```{r}
+chisq.test(All_Grad_SS$Grad.Rate, All_Grad_SS$FARMS.Pct, correct = TRUE)
+```
+
+### Rename the column headers for MCPS and PGCPS data frames so that they match, and then bind them together.
+
+```{r}
+MCPS <- MCPS %>% 
+  rename(
+   School.Name = MCPS_name,
+   School.Zip = MCPS_zip
+    )
+PGCPS <- PGCPS %>% 
+  rename(
+    School.Name = PGCPS_name,
+    School.Zip = PGCPS_zip
+    )
+All_School_Zip <- rbind(MCPS, PGCPS)
+```
+
+### I realized I was missing some schools from these data frames so I added in new rows.
+
+```{r}
+MCPS2 <- MCPS %>% add_row(School.Name = "Regional Institute for Children & Adolescents", School.Zip = 20850)
+PGCPS2 <- PGCPS %>% add_row(School.Name = "Annapolis Road Academy", School.Zip = 20716) %>% add_row(School.Name = "Green Valley Academy at Edgar Allan Poe", School.Zip = 20746)
+```
+
+
+### There were multiple instances where the school name was slightly off ("Northwood High School" instead of "Northwood High"), so I renamed them here.
+
+```{r}
+All_Grad_SS$School.Name[14]= "Northwood High"
+```
+
+```{r}
+All_Grad_SS$School.Name[79]= "Northwood High"
+All_Grad_SS$School.Name[142]= "Northwood High"
+All_Grad_SS$School.Name[209]= "Northwood High"
+All_Grad_SS$School.Name[65]= "Tall Oaks High"
+```
+
+```{r}
+All_Grad_SS$School.Name[40]= "Croom High"
+```
+
+### I removed all the rows of schools that either don't exist anymore or ones that I couldn't find sufficient or consistent information on online.
+
+```{r}
+All_Grad_SS2 <- All_Grad_SS[-c(47, 112, 53, 118, 181, 247, 314, 57, 186, 11, 76, 206, 272), ]
+```
+
+### Now that I had changed some of the school names, I had to re-do creating a new column combining School Names and Academic Year so that there's a unique identifier for each row.
+
+```{r}
+All_Grad_SS2$School.By.Year <- paste(All_Grad_SS2$School.Name, All_Grad_SS2$Academic.Year)
+```
+
+### I created a new data frame with all the school names and their zip code in two columns.
+
+```{r}
+All_School_Zip2 <- rbind(MCPS2, PGCPS2)
+```
+
+### I merged the All_Grad_SS2 dataset (which is the combined data frame of both the Graduation Rates and Students Receiving Special Services data frames) with the new data frame I made of all school names and their zip codes. Now I have one full data frame with all the school data and their zip codes.
+
+```{r}
+NEW_All_School_Data <- merge(All_Grad_SS2, All_School_Zip2, by.x = "School.Name", by.y = "School.Name")
+```
 
