@@ -588,9 +588,15 @@ All_School_Zip2 <- rbind(MCPS2, PGCPS2)
 NEW_All_School_Data <- merge(All_Grad_SS2, All_School_Zip2, by.x = "School.Name", by.y = "School.Name")
 ```
 
+
+## Load in ggplot2. 
+
 ```{r}
 library("ggplot2")
 ```
+
+
+### I attempted to create an area plot to look at Graduation Rates in both counties across all years. As you can see, something went wrong.
 
 ```{r}
 grad_year_plot <- ggplot(NEW_All_School_Data, aes(x=Academic.Year, y=Grad.Rate, fill=LEA.Name)) + 
@@ -607,6 +613,9 @@ group_by(LEA.Name, Academic.Year) %>%
 summarise_all(list(mean=mean))
 avg_FARMS_grad
 ```
+
+## Install and load ggthemes package. Create a line graph looking at the average FARMS Percentage across all years for both counties. I used the "economist" theme from the ggthemes package, and changed the y-axis scale to make the graph easier to interpret.
+
 ```{r}
 install.packages("ggthemes")
 library(ggthemes)
@@ -616,5 +625,51 @@ plot_FARMS <- ggplot(data=avg_FARMS_grad, aes(x=Academic.Year, y=FARMS.Pct_mean,
   theme_economist() + scale_fill_economist()
   geom_point()
 plot_FARMS
+```
+### I changed the Zip Code variable in the LIHTC dataset and renamed it to prepare to merge it with my full school data frame.
+
+```{r}
+LIHTC_county$proj_zip <- as.numeric(LIHTC_county$proj_zip)
+LIHTC_county2 <- LIHTC_county %>% 
+  rename(
+   School.Name = proj_zip
+    )
+```
+
+```{r}
+LIHTC_county2 <- LIHTC_county2 %>% 
+  rename(
+   School.Zip = School.Name
+    )
+```
+
+### I created a new dataframe with just the zip codes and totals of li_units (low income housing units) from my LIHTC data to prepare to merge with another data frame.
+
+```{r}
+LIHTC_zip <- aggregate(LIHTC_county2$li_units, by=list(Category=LIHTC_county2$School.Zip), FUN=sum)
+LIHTC_zip
+```
+### More column header renaming.
+
+```{r}
+LIHTC_zip <- LIHTC_zip %>% 
+  rename(Total_LIunits = x)
+```
+
+```{r}
+LIHTC_zip <- LIHTC_zip %>% 
+  rename(School.Zip = Category)
+```
+
+### I merged my full school data frame with this LIHTC_zip data frame so that I would now have a column with the number of low income housing units for each school's zip code.
+
+```{r}
+NEW_LIHTC_SCHOOL_Data <- merge(NEW_All_School_Data, LIHTC_zip, by.x = "School.Zip", by.y = "School.Zip", all = TRUE)
+```
+
+### My data frames were unequal in size, so when I merged them, 14 extra rows were created only with zip code and li_units data so I removed them here.
+
+```{r}
+NEW_LIHTC_SCHOOL_Data <- NEW_LIHTC_SCHOOL_Data[-c(34, 47, 79, 80, 154, 165, 171, 182, 188, 269, 310, 326, 327, 328), ]
 ```
 
