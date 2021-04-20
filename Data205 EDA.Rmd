@@ -588,3 +588,33 @@ All_School_Zip2 <- rbind(MCPS2, PGCPS2)
 NEW_All_School_Data <- merge(All_Grad_SS2, All_School_Zip2, by.x = "School.Name", by.y = "School.Name")
 ```
 
+```{r}
+library("ggplot2")
+```
+
+```{r}
+grad_year_plot <- ggplot(NEW_All_School_Data, aes(x=Academic.Year, y=Grad.Rate, fill=LEA.Name)) + 
+    geom_area()
+grad_year_plot
+```
+
+### Calculate the mean Graduation Rates and FARMS Percentages for both counties across all years.
+
+```{r}
+avg_FARMS_grad <- drop_na(NEW_All_School_Data) %>%
+select(LEA.Name, Academic.Year, Grad.Rate, FARMS.Pct) %>%
+group_by(LEA.Name, Academic.Year) %>%
+summarise_all(list(mean=mean))
+avg_FARMS_grad
+```
+```{r}
+install.packages("ggthemes")
+library(ggthemes)
+plot_FARMS <- ggplot(data=avg_FARMS_grad, aes(x=Academic.Year, y=FARMS.Pct_mean, color=LEA.Name)) +
+  geom_line()+
+  ylim(35,60) +
+  theme_economist() + scale_fill_economist()
+  geom_point()
+plot_FARMS
+```
+
