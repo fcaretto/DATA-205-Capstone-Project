@@ -673,3 +673,21 @@ NEW_LIHTC_SCHOOL_Data <- merge(NEW_All_School_Data, LIHTC_zip, by.x = "School.Zi
 NEW_LIHTC_SCHOOL_Data <- NEW_LIHTC_SCHOOL_Data[-c(34, 47, 79, 80, 154, 165, 171, 182, 188, 269, 310, 326, 327, 328), ]
 ```
 
+### Create a boxplot comparing average graduation rates between Montgomery County and Prince George's County.
+
+```{r}
+library("ggpubr")
+ggboxplot(avg_FARMS_grad, x = "LEA.Name", y = "Grad.Rate_mean", 
+          color = "LEA.Name", palette = c("#00AFBB", "#E7B800", "#FC4E07"),
+          ylab = "Average Graduation Rate", xlab = "County")
+```
+
+### Conduct a one-way ANOVA test to see if there's a significant difference between the average graduation rates between the two counties.
+
+```{r}
+grad.aov <- aov(Grad.Rate ~ LEA.Name, data = NEW_LIHTC_SCHOOL_Data)
+
+summary(grad.aov)
+```
+
+### Since the p-value is less than 0.05, we can conclude that there are significant differences between the two counties.
