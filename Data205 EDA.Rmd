@@ -691,3 +691,50 @@ summary(grad.aov)
 ```
 
 ### Since the p-value is less than 0.05, we can conclude that there are significant differences between the two counties.
+
+## Create descriptive visualizations for each dataset.
+
+### Install highcharter package for interactive visualizations and load it in.
+```{r}
+install.packages("highcharter")
+library("highcharter")
+
+```
+
+### Create a horizontal bar chart showing the total MPDUs for each Planning Area from the MPDU dataset.
+
+```{r}
+MPDU_plot <- MPDU_Sums_PA %>%
+  hchart(
+  'bar', hcaes(x = Planning.Area, y = Total.MPDU),
+  color = "lightblue", borderColor = "black"
+  )
+MPDU_plot
+```
+
+### Here we can see that Clarksburg has the most, followed by "NA," which is pretty unhelpful.
+
+### Rename the "x" column of the HOC_zip dataframe to "Units."
+
+```{r}
+HOC_zip <- HOC_zip %>% 
+  rename(Units = x)
+```
+
+## Make a bar chart showing the top 10 zip codes in Montgomery County with the most housing units owned by the Housing Opportunities Community.
+
+```{r}
+HLR_plot2 <- HOC_zip %>% 
+  subset(Group.2=='Housing Opportunities Community') %>%
+  arrange(desc(Units))%>%
+  head(10)%>%
+  hchart(
+  'bar', hcaes(x = Category, y = Units, group = Group.2),
+  color = "lightgreen", borderColor = "black"
+  ) %>%
+  hc_yAxis(title = list(text = "Unit Count")) %>%
+ hc_xAxis(title = list(text = "Zip Code"))
+HLR_plot2
+```
+
+### This isn't the best graph, since the bars are on top of each other but the hover tool makes it easy enough to see which bar is for which zip code. 20886 has the most units owned by the HOC, followed by 20814.
