@@ -778,3 +778,16 @@ Cor2
 ```
 
 ### It worked! This shows that out of all 5 of these variables, FARMS and School Zip Code have the strongest correlation with each other (and is also a negative correlation), followed by FARMS and Graduation Rate (also a negative correlation), and FARMS and Low-Income Units (a positive correlation). This is very interesting data.
+
+### Create a scatter plot visualizing the correlation between Graduation Rates and Total Low-Income Units.
+
+```{r}
+library("ggpubr")
+scatter_Grad_LI <- ggscatter(NEW_LIHTC_SCHOOL_Data, x = "Grad.Rate", y = "Total_LIunits",
+          add = "reg.line", conf.int = TRUE, 
+          cor.coef = TRUE, cor.method = "pearson",
+          xlab = "Graduation Rates", ylab = "Total Low-Income Units")
+scatter_Grad_LI
+```
+
+
