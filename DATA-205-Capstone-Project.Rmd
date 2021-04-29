@@ -1,0 +1,89 @@
+---
+title: "DATA-205-Capstone-Project"
+author: "Fiona Caretto"
+date: "4/28/2021"
+output: html_document
+---
+
+# Loading In Datasets
+
+First, I read in two dataMontgomery datasets: "Moderately Priced Dwelling Units" (named as "MPDU") and "Housing Licensing and Registration" (named as "HLR").
+
+```{r}
+MPDU <- read.csv("https://data.montgomerycountymd.gov/api/views/pbh5-g4e5/rows.csv?accessType=DOWNLOAD")
+HLR <- read.csv("https://data.montgomerycountymd.gov/api/views/et5s-xste/rows.csv?accessType=DOWNLOAD")
+```
+
+Next, I will read in the "Students Receiving Special Services" dataset from the Maryland State Department of Education, one for each year 2015-2019. Each of these will be called "SS+last two digits of year."
+
+```{r}
+url1 <- "https://reportcard.msde.maryland.gov/DataDownloads/FileDownload/378"
+download.file(url1, "Special_Services_2019.zip")
+unzip("Special_Services_2019.zip")
+SS19 <- read.csv("Special_Services_2019.csv")
+```
+
+```{r}
+url2 <- "https://reportcard.msde.maryland.gov/DataDownloads/FileDownload/341"
+download.file(url2, "Special_Services_2018.zip")
+unzip("Special_Services_2018.zip")
+SS18 <- read.csv("Special_Services_2018.csv")
+```
+
+```{r}
+url3 <- "https://reportcard.msde.maryland.gov/DataDownloads/FileDownload/322"
+download.file(url3, "Special_Services_2017.zip")
+unzip("Special_Services_2017.zip")
+SS17 <- read.csv("Special_Services_2017.csv")
+```
+
+```{r}
+url4 <- "https://reportcard.msde.maryland.gov/DataDownloads/FileDownload/298"
+download.file(url4, "Special_Services_2016.zip")
+unzip("Special_Services_2016.zip")
+SS16 <- read.csv("Special_Services_2016.csv")
+```
+
+```{r}
+url5 <- "https://reportcard.msde.maryland.gov/DataDownloads/FileDownload/258"
+download.file(url5, "Special_Services_2015.zip")
+unzip("Special_Services_2015.zip")
+SS15 <- read.csv("Special_Services_2015.csv")
+```
+
+Now, I will read in the "Adjusted Cohort Graduation Rate" datasets also from the Maryland State Department of Education, also for 2015-2019. Each of these will be named "Grad+last two digits of year."
+
+```{r}
+url6 <- "https://reportcard.msde.maryland.gov/DataDownloads/FileDownload/390"
+download.file(url6, "Cohort_Graduation_and_Dropout_Rates_2019.zip")
+unzip("Cohort_Graduation_and_Dropout_Rates_2019.zip")
+Grad19 <- read.csv("Cohort_Grad_Rate_2019.csv")
+```
+
+```{r}
+url7 <- "https://reportcard.msde.maryland.gov/DataDownloads/FileDownload/354"
+download.file(url7, "Cohort_Graduation_and_Dropout_Rates_2018.zip")
+unzip("Cohort_Graduation_and_Dropout_Rates_2018.zip")
+Grad18 <- read.csv("Cohort_Grad_Rate_2018.csv")
+```
+
+```{r}
+url8 <- "https://reportcard.msde.maryland.gov/DataDownloads/FileDownload/326"
+download.file(url8, "Cohort_Grad_Rate_2017.zip")
+unzip("Cohort_Grad_Rate_2017.zip")
+Grad17 <- read.csv("Cohort_Grad_Rate_2017.csv")
+```
+
+```{r}
+url9 <- "https://reportcard.msde.maryland.gov/DataDownloads/FileDownload/302"
+download.file(url9, "Cohort_Grad_Rate_2016.zip")
+unzip("Cohort_Grad_Rate_2016.zip")
+Grad16 <- read.csv("Cohort_Grad_Rate_2016.csv")
+```
+
+```{r}
+url10 <- "https://reportcard.msde.maryland.gov/DataDownloads/FileDownload/262"
+download.file(url10, "Cohort_Grad_Rate_2015.zip")
+unzip("Cohort_Grad_Rate_2015.zip")
+Grad15 <- read.csv("Cohort_Grad_Rate_2015.csv")
+```
