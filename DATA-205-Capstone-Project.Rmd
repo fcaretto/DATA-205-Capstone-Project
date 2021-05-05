@@ -87,3 +87,33 @@ download.file(url10, "Cohort_Grad_Rate_2015.zip")
 unzip("Cohort_Grad_Rate_2015.zip")
 Grad15 <- read.csv("Cohort_Grad_Rate_2015.csv")
 ```
+
+Lastly, I will read in the Low-Income Housing Tax Credit dataset from the Department of Housing and Urban Development.
+
+```{r}
+url11 <- "https://lihtc.huduser.gov/lihtcpub.zip"
+download.file(url11, "lihtcpub.zip")
+unzip("lihtcpub.zip")
+LIHTC <- read.csv("LIHTCPUB.CSV")
+```
+
+To start preparing to merge my datasets along school names and zip codes, I am going to make two new data frames: one with all MCPS high schools and their zip codes and one with all PGCPS high schools and their zip codes.
+
+I will install the tidyverse package in order to do this.
+
+```{r}
+install.packages("tidyverse")
+library(tidyverse)
+MCPS <- data.frame(
+  School.Name = c("Stephen Knolls School", "Longview School", "Montgomery Blair High", "Northwest High", "Walter Johnson High", "Richard Montgomery High", "Gaithersburg High", "Clarksburg High", "Winston Churchill High", "Bethesda-Chevy Chase High", "Quince Orchard High", "Thomas S. Wootton High", "Walt Whitman High", "Wheaton High", "Sherwood High", "Paint Branch High", "John F. Kennedy High", "Albert Einstein High", "Northwood High", "Springbrook High", "James Hubert Blake High", "Watkins Mill High", "Col. Zadok Magruder High", "Rockville High", "Damascus High", "Poolesville High", "Seneca Valley High", "Alternative Programs", "John L Gildner Regional Inst for Children & Adol", "Rock Terrace School"),
+  School.Zip = c(20895, 20874, 20901, 20874, 20814, 20852, 20877, 20871, 20854, 20814, 20878, 20850, 20817, 20906, 20860, 20866, 20902, 20895, 20901, 20904, 20905, 20879, 20855, 20851, 20872, 20837, 20874, 20853, 20850, 20850))
+PGCPS = data.frame(
+  School.Name = c("Eleanor Roosevelt High","High Point High","Bowie High","Parkdale High","Northwestern High","Dr. Henry A. Wise, Jr. High","Charles Herbert Flowers High","Duval High","Suitland High","Bladensburg High","Laurel High","Oxon Hill High","Potomac High","Frederick Douglass High","Crossland High","Gwynn Park High","Largo High","Central High","Friendly High","Fairmont Heights High","Surrattsville High","Academy of Health Sciences at PGCC","Chesapeake Math and IT Public Charter","International High school @ Largo","Northwestern Evening/Saturday High","International High School @ Langley Park","Chesapeake Math and IT South Public Charter","College Park Academy","Crossland Evening/Saturday High","Tall Oaks High","Croom High","Community Based Classrooms","C. Elizabeth Rieg Regional Center","James E. Duckworth Regional Center"),
+  School.Zip = c(20770, 20705, 20715, 20737, 20782, 20772, 20774, 20706, 20746, 20710, 20707, 20745, 20745, 20772, 20748, 20613, 20774, 20747, 20744, 20785, 20735, 20774, 20707, 20772, 20782, 20710, 20772, 20737, 20748, 20721, 20623, 20710, 20716, 20705))
+
+MCPS <- MCPS %>% add_row(School.Name = "Regional Institute for Children & Adolescents", School.Zip = 20850)
+PGCPS <- PGCPS %>% add_row(School.Name = "Annapolis Road Academy", School.Zip = 20716) %>% add_row(School.Name = "Green Valley Academy at Edgar Allan Poe", School.Zip = 20746)
+School_Zips <- rbind(MCPS, PGCPS)
+```
+
+I had to add some rows afterwards that I had initially, unintentionally left out of these data frames.
