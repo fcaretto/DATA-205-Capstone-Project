@@ -5,7 +5,7 @@ date: "4/28/2021"
 output: html_document
 ---
 
-# Loading In Datasets
+# Loading in datasets
 
 First, I read in two dataMontgomery datasets: "Moderately Priced Dwelling Units" (named as "MPDU") and "Housing Licensing and Registration" (named as "HLR").
 
@@ -117,3 +117,170 @@ School_Zips <- rbind(MCPS, PGCPS)
 ```
 
 I had to add some rows afterwards that I had initially, unintentionally left out of these data frames.
+
+# Looking at the structure of the datasets
+
+```{r}
+head(HLR)
+tail(HLR)
+summary(HLR)
+```
+```{r}
+head(LIHTC)
+tail(LIHTC)
+summary(LIHTC)
+```
+```{r}
+head(MCPS)
+tail(MCPS)
+summary(MCPS)
+```
+```{r}
+head(MPDU)
+tail(MPDU)
+summary(MPDU)
+```
+```{r}
+head(PGCPS)
+tail(PGCPS)
+summary(PGCPS)
+```
+```{r}
+head(School_Zips)
+tail(School_Zips)
+summary(School_Zips)
+```
+```{r}
+head(Grad15)
+tail(Grad15)
+summary(Grad15)
+```
+```{r}
+head(SS15)
+tail(SS15)
+summary(SS15)
+```
+#Wrangle, clean, mutate the data.
+
+I'm going to create a new data frame out of the MPDU dataset showing just Total Units and Total MPDU, grouped by Planning Area, naming the new dataset "MPDU2."
+
+```{r}
+MPDU2 <- MPDU %>% 
+select(Planning.Area, Total.Units, Total.MPDU) %>%
+group_by(Planning.Area)
+MPDU2
+```
+From this new data frame, I'm going to create a new one showing the sum of Total Units and Total MPDU, by Planning Area. First, I need to drop the NAs from the MPDU2 data frame.
+
+```{r}
+MPDU2 <- drop_na(MPDU2)
+MPDU_Sums <- MPDU2 %>% 
+    summarize_if(is.integer, sum)
+MPDU_Sums
+```
+
+Now I will create a new data frame with variables of interest from the HLR dataset: Ownership Type, Property Zip Code, and Unit Count.
+
+```{r}
+HLR2 <- HLR %>% 
+select(Ownership.Type, Property.Zip.Code, Unit.Count) %>%
+group_by(Ownership.Type)
+HLR2
+```
+
+Turning to my Adjusted Cohort Graduation Rates datasets, I need to do a bit of cleaning so that the columns of all these datasets match, making it easier to combine them later on.
+
+```{r}
+Grad15 <- Grad15 %>% 
+  rename(Academic.Year = Class.of.Year)
+Grad16 <- Grad16 %>% 
+  rename(Academic.Year = Class.of.Year)
+```
+
+```{r}
+Grad17 <- Grad17 %>%
+  rename(LEA = LEA.Number)
+Grad18 <- Grad18 %>%
+  rename(LEA = LSS.Number, LEA.Name = LSS.Name)
+Grad19 <- Grad19 %>%
+  rename(LEA = LSS.Number, LEA.Name = LSS.Name)
+```
+
+Now, I will combine all five Adjusted Cohort Graduation Rates into one data frame.
+
+```{r}
+Total_Grad <- rbind(Grad15, Grad16, Grad17, Grad18, Grad19)
+```
+
+For my project, I am only interested in looking at the data for Montgomery County and Prince George's County, so I'm going to pull out that data.
+
+```{r}
+Total_Grad2 <- subset(Total_Grad, LEA.Name == "Montgomery" & Cohort == "4-year adjusted cohort" | LEA.Name == "Prince George's" & Cohort == "4-year adjusted cohort")
+```
+
+In the Graduation Rates column, some of the values are represented by inequalities: <= 5.00 and >= 95.00. Since I only want numbers in this column, I'm going to replace these values with 5 and 95 respectively.
+
+```{r}
+Total_Grad2[Total_Grad2== ">= 95.00"] <-  "95.00"
+```
+
+```{r}
+Total_Grad2[Total_Grad2== "<= 5.00"] <-  "5.00"
+```
+
+Now, I will convert the Graduation Rate variable from characters to numerics.
+
+```{r}
+Total_Grad2$Grad.Rate <- as.numeric(Total_Grad2$Grad.Rate)
+```
+
+Taking a look at the NAs introduce by coercion.
+
+```{r}
+summary(Total_Grad2)
+```
+
+Turning to the Students Receiving Special Services datasets, I will first rename some columns so that all of the datasets match up, and then I'll create new data frames pulling in only the variables I am interested in.
+
+```{r}
+SS15_2 <- SS15 %>% 
+select(Academic.Year, LEA.Name, School.Name, School.Type, FARMS.Pct)
+SS15_2
+
+SS16_2 <- SS16 %>% 
+select(Academic.Year, LEA.Name, School.Name, School.Type, FARMS.Pct)
+SS16_2
+
+SS17_2 <- SS17 %>% 
+select(Academic.Year, LEA.Name, School.Name, School.Type, FARMS.Pct)
+SS17_2
+
+SS18_2 <- SS18 %>% 
+  rename(LEA.Name = LSS.Name) %>%
+  select(Academic.Year, LEA.Name, School.Name, School.Type, FARMS.Pct)
+SS18_2
+
+SS19_2 <- SS19 %>% 
+  rename(LEA.Name = LSS.Name) %>%
+  select(Academic.Year, LEA.Name, School.Name, School.Type, FARMS.Pct)
+SS19_2
+```
+
+```{r}
+Total_SS <- rbind(SS15_2, SS16_2, SS17_2, SS18_2, SS19_2)
+```
+
+Now, I will combine my Graduation Rates and Special Services data frames.
+
+```{r}
+Grad_SS <- merge(Total_Grad2, Total_SS)
+```
+
+Remove Elementary and Middle Schools from this data frame.
+
+```{r}
+Grad_SS <- Grad_SS %>%
+  filter(substr(School.Type, 1, 4) == "High")
+```
+
+
