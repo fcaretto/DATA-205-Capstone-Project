@@ -273,14 +273,154 @@ Total_SS <- rbind(SS15_2, SS16_2, SS17_2, SS18_2, SS19_2)
 Now, I will combine my Graduation Rates and Special Services data frames.
 
 ```{r}
-Grad_SS <- merge(Total_Grad2, Total_SS)
+Total_Grad_SS <- merge(Total_Grad2, Total_SS)
 ```
 
 Remove Elementary and Middle Schools from this data frame.
 
 ```{r}
-Grad_SS <- Grad_SS %>%
+Total_Grad_SS <- Total_Grad_SS %>%
   filter(substr(School.Type, 1, 4) == "High")
 ```
 
+There were multiple instances where the school name was slightly off ("Northwood High School" instead of "Northwood High"), so I renamed them.
+
+```{r}
+Total_Grad_SS[Total_Grad_SS == "Northwood High School"] <- "Northwood High"
+```
+
+```{r}
+Total_Grad_SS[Total_Grad_SS == "Tall Oaks Vocational"] <- "Tall Oaks High"
+```
+
+```{r}
+Total_Grad_SS[Total_Grad_SS == "Croom Vocational"] <- "Croom High"
+```
+
+I am now removing the rows for "All Montgomery Schools" and "All Prince George's Schools," and all the rows of schools that either don't exist anymore or ones that I couldn't find sufficient or consistent information on online.
+
+```{r}
+Total_Grad_SS <- subset(Total_Grad_SS, School.Name!="All Montgomery Schools")
+```
+
+```{r}
+Total_Grad_SS <- subset(Total_Grad_SS, School.Name!="All Prince George's Schools")
+```
+
+```{r}
+Total_Grad_SS <- subset(Total_Grad_SS, School.Name!="Forestville High")
+```
+
+```{r}
+Total_Grad_SS <- subset(Total_Grad_SS, School.Name!="Incarcerated Youth Center (JACS)")
+```
+
+```{r}
+Total_Grad_SS <- subset(Total_Grad_SS, School.Name!="Margaret Brent Regional Center")
+```
+
+```{r}
+Total_Grad_SS <- subset(Total_Grad_SS, School.Name!="MCPS Transitions School")
+```
+
+Now, I am creating a new column combining School Names and Academic Year so that there's a unique identifier for each row.
+
+```{r}
+Total_Grad_SS$School.By.Year <- paste(Total_Grad_SS$School.Name, Total_Grad_SS$Academic.Year)
+```
+
+Now, I will merge the Total_Grad_SS dataset with the School_Zips data frame I made of all school names and their zip codes. Now I have one full data frame with all the school data and their zip codes.
+
+```{r}
+School <- merge(Total_Grad_SS, School_Zips, by.x = "School.Name", by.y = "School.Name")
+```
+
+Turning back to my Housing Licensing and Registration data, I will now create a new data frame from the HLR2 data frame showing the total amount of units under each Ownership Type by Property Zip Code.
+
+```{r}
+HLR_zip <- aggregate(HLR2$Unit.Count, by=list(Category=HLR2$Property.Zip.Code, HLR2$Ownership.Type), FUN=sum)
+HLR_zip
+```
+Now, for my LIHTC dataset, I am going to pull out the data only for Montgomery and Prince George's county, by extracting this data from the "fips2010" variable. This variable is the FIPS code of the public housing project, which contains the State FIPS code, County FIPS code, and Census Tract number.
+
+```{r}
+LIHTC2 <- LIHTC %>%
+  filter((substr(fips2010, 1, 5) == "24031") | (substr(fips2010, 1, 5) == "24033"))
+```
+
+Now, I am preparing to merge the LIHTC data with my School data frame. First, I will rename the zip code variable of the LIHTC data frame, and then change the data type of the zip code in the School data frame to "character," to match the zip code variable type in the LIHTC data frame.
+
+```{r}
+LIHTC2 <- LIHTC2 %>% 
+  rename(
+   School.Name = proj_zip)
+```
+
+Oops, changed it to the wrong name.
+
+```{r}
+LIHTC2 <- LIHTC2 %>% 
+  rename(
+   School.Zip = School.Name
+    )
+```
+
+```{r}
+LIHTC3 <- aggregate(LIHTC2$li_units, by=list(Category=LIHTC2$School.Zip), FUN=sum)
+LIHTC3
+```
+```{r}
+LIHTC3 <- LIHTC3 %>% 
+  rename(Total_LIunits = x)
+```
+
+```{r}
+LIHTC3 <- LIHTC3 %>% 
+  rename(School.Zip = Category)
+```
+
+```{r}
+School$School.Zip <- as.character(School$School.Zip)
+```
+
+```{r}
+School2 <- merge(School, LIHTC3, by.x = "School.Zip", by.y = "School.Zip", all = TRUE)
+```
+
+My data frames were unequal in size, so when I merged them, 15 extra rows were created so I removed them here.
+
+```{r}
+School2 <- School2 %>% drop_na(School.Name)
+```
+
+In the FARMS Percentage column, some of the values are represented by inequalities: <= 5.0 and >= 95.0. Since I only want numbers in this column, I'm going to replace these values with 5 and 95 respectively.
+
+```{r}
+School2[School2== ">= 95.0"] <-  "95.0"
+```
+
+```{r}
+School2[School2== "<= 5.0"] <-  "5.0"
+```
+
+Now, I will convert the FARMS Percentage variable from characters to numerics.
+
+```{r}
+School2$FARMS.Pct <- as.numeric(School2$FARMS.Pct)
+```
+
+Taking a look at the NAs introduce by coercion.
+
+```{r}
+summary(School2)
+```
+
+For HLR_zip, I am renaming the columns.
+
+```{r}
+HLR_zip <- HLR_zip %>% 
+  rename(Units = x) %>%
+  rename(Property.Zip = Category) %>%
+  rename(Ownership = Group.2)
+```
 
