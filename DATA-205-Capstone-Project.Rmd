@@ -424,3 +424,122 @@ HLR_zip <- HLR_zip %>%
   rename(Ownership = Group.2)
 ```
 
+#Perform descriptive statistics.
+
+Let's find the mean graduation rates by county for all years combined (2015-2019).
+
+```{r}
+mean_grad <- drop_na(School2) %>%
+select(LEA.Name, Grad.Rate) %>%
+group_by(LEA.Name) %>%
+summarise_all(funs(mean))
+mean_grad
+```
+In preparation for visualizations, I am going to install the necessary packages.
+
+```{r}
+install.packages("ggplot2")
+library("ggplot2")
+install.packages("ggthemes")
+library("ggthemes")
+install.packages("highcharter")
+library("highcharter")
+```
+
+I'm going to make a line graph of graduation rates by county over time.
+
+```{r}
+mean_grad2 <- drop_na(School2) %>%
+select(LEA.Name, Grad.Rate, Academic.Year) %>%
+group_by(Academic.Year, LEA.Name) %>%
+summarise_if(is.numeric, mean)
+mean_grad2
+```
+```{r}
+mean_grad2$Grad.Rate <- as.numeric(mean_grad2$Grad.Rate)
+```
+
+```{r}
+mean_grad2 %>% hchart(
+  'line', hcaes(x = Academic.Year, y = Grad.Rate, group = LEA.Name))
+```
+
+From this graph, you can see that Montgomery County's graduation rates stay consistently higher than Prince George's County's, and both counties experiencing peaks and drops over the years, although not in the same pattern.
+
+Turning to the HLR data, I want to find the top 10 zip codes in Montgomery County with the highest total units owned by the Housing Opportunities Community.
+
+```{r}
+HLR_zip %>% 
+  subset(Ownership=='Housing Opportunities Community') %>%
+  arrange(desc(Units))%>%
+  head(10)
+```
+Visualize this on a bar graph.
+
+```{r}
+HOC_plot <- HLR_zip %>% 
+  subset(Ownership=='Housing Opportunities Community') %>%
+  arrange(desc(Units))%>%
+  head(10) %>%
+ggplot(HLR_zip, mapping = aes(x=Property.Zip, y=Units, color=Ownership)) +
+  geom_bar(stat="identity", fill="orange") +
+  theme(axis.text.x = element_text(angle = 45))
+HOC_plot
+```
+
+These zip codes correspond to the following MCPS high schools: Bethesda-Chevy Chase, Walter Johnson, Northwest, Longview, Seneca Valley, Watkins Mill, Montgomery Blair, Northwood, John F. Kennedy, and Springbrook.
+
+Now, I want to find the same data for Prince George's County. Since I don't have an equivalent dataset for PG County, I will use the low-income housing units data from HUD.
+
+```{r}
+PG_LIunits <- drop_na(School2) %>%
+select(LEA.Name, Total_LIunits, School.Zip) %>%
+subset(LEA.Name=="Prince George's") %>%
+group_by(School.Zip) %>%
+arrange(desc(Total_LIunits))%>%
+head(70)
+PG_LIunits
+```
+
+```{r}
+PG_LI_plot <- 
+ggplot(PG_LIunits, mapping = aes(x=School.Zip, y=Total_LIunits, color=LEA.Name)) +
+  geom_bar(stat="identity", fill="purple") +
+  theme(axis.text.x = element_text(angle = 45))
+PG_LI_plot
+```
+
+These zip codes correspond to the following PGCPS high schools: Duval, Laurel, Chesapeake Math and IT Public Charter, Bladensburg, International High School @ Langley Park, Community Based Classrooms, C. Elizabeth Rieg Regional Center, Annapolis Road Academy, College Park Academy, Parkdale, Green Valley Academy at Edgar Allan Poe, Suitland, Central, Crossland, Crossland Evening/Saturday, Northwestern, Northwestern Evening/Saturday, and Fairmont Heights.
+
+Now, I want to look at the FARMS data for both counties over time.
+
+```{r}
+mean_FARMS <- drop_na(School2) %>%
+select(LEA.Name, FARMS.Pct, Academic.Year) %>%
+group_by(Academic.Year, LEA.Name) %>%
+summarise_if(is.numeric, mean)
+mean_FARMS
+```
+```{r}
+mean_FARMS$FARMS.Pct <- as.numeric(mean_FARMS$FARMS.Pct)
+```
+
+```{r}
+mean_FARMS %>% hchart(
+  'line', hcaes(x = Academic.Year, y = FARMS.Pct, group = LEA.Name))
+```
+
+This line graph shows us that Montgomery County's FARMS rates are consistently lower than Prince George's County's, and that the trends between counties appear to be the opposite of each other.
+
+Next, I want to take a look at the MPDU data, and see which Planning Areas have the most and least MPDUs.
+
+```{r}
+MPDU_plot <- MPDU_Sums %>%
+  hchart(
+  'bar', hcaes(x = Planning.Area, y = Total.MPDU),
+  color = "#49E3D0", borderColor = "black"
+  )
+MPDU_plot
+```
+
+Here we can see that Clarksburg has the most MPDUs, followed by "NA." It's a bit confusing that the "NA" planning area has so many MPDUs.
