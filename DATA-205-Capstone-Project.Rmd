@@ -626,3 +626,5 @@ corrplot(School_cor, method = "circle")
 ```
 
 This plot makes it easier for us to see that out of these three variables, FARMS Percentage and Graduation Rate have the strongest correlation, followed by FARMS Percentage and Total Low-Income Housing Units, and lastly Graduation Rates and Total Low-Income Housing Units, which had the weakest correlation.
+
+Thank you for looking at my project! Please see my Github repo for presentations, links to datasets, and other information on this project.
