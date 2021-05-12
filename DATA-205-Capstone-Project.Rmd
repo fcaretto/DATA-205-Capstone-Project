@@ -543,3 +543,86 @@ MPDU_plot
 ```
 
 Here we can see that Clarksburg has the most MPDUs, followed by "NA." It's a bit confusing that the "NA" planning area has so many MPDUs.
+
+#Statistical analysis.
+
+## FARMS and Graduation Rates.
+
+I'm going to run a Pearson's Correlation Test on Graduation Rate and FARMS Percentage.
+
+```{r}
+Pearson_Grad_FARMS <- cor.test(School2$Grad.Rate, School2$FARMS.Pct, 
+                    method = "pearson")
+Pearson_Grad_FARMS
+```
+
+The results of this test suggest that these two variables have a statistically significant negative, moderate correlation with a correlation coefficient of -0.49.
+
+I want to see if there's a significant difference between the average graduation rates between the two counties, so I'm giong to conduct a one-way ANOVA test.
+
+```{r}
+grad.aov <- aov(Grad.Rate ~ LEA.Name, data = School2)
+
+summary(grad.aov)
+```
+
+Since the p-value is less than 0.05, we can conclude that there are significant differences between Graduation Rates across the two counties.
+
+```{r}
+hchart(School2, "scatter", hcaes(x = Grad.Rate, y = FARMS.Pct, group = LEA.Name))
+```
+
+```{r}
+library("ggpubr")
+ggscatter(School2, x = "Grad.Rate", y = "FARMS.Pct",
+          add = "reg.line", conf.int = TRUE, 
+          cor.coef = TRUE, cor.method = "pearson",
+          xlab = "Graduation Rates", ylab = "FARMS Percentage")
+```
+
+## FARMS and Low-Income Housing.
+
+```{r}
+Pearson_LI_FARMS <- cor.test(School2$FARMS.Pct, School2$Total_LIunits, 
+                    method = "pearson")
+Pearson_LI_FARMS
+```
+
+The p-value is less than 0.05, which suggests that amount of low-income units in the school's zip code and FARMS percentage of that school have a positive, weak correlation with a correlation coefficient of 0.23.
+
+Here's a scatter plot of that data with a regression line.
+
+```{r}
+ggscatter(School2, x = "FARMS.Pct", y = "Total_LIunits",
+          add = "reg.line", conf.int = TRUE, 
+          cor.coef = TRUE, cor.method = "pearson",
+          xlab = "FARMS Percentage", ylab = "Total Low-Income Housing Units")
+```
+
+I want to look at the relationships between all the continuous variables from my School data. To do this, I will make a correlation matrix/correlogram.
+
+First, I will create a data frame that only includes the numeric variables from the School data frame.
+
+```{r}
+School_Numerics <- School2 %>% select(Grad.Rate, FARMS.Pct, Total_LIunits)
+```
+
+Now, I will make a correlation matrix out of my numerics-only data. I'll use the "cor" function for this and set "use" to "complete.obs" since my data has a lot of NAs.
+
+```{r}
+School_cor <- round(cor(School_Numerics, use = "complete.obs"), 2)
+School_cor
+```
+
+Now for the correlogram.
+
+```{r}
+install.packages("corrplot")
+library("corrplot")
+```
+
+```{r}
+corrplot(School_cor, method = "circle")
+```
+
+This plot makes it easier for us to see that out of these three variables, FARMS Percentage and Graduation Rate have the strongest correlation, followed by FARMS Percentage and Total Low-Income Housing Units, and lastly Graduation Rates and Total Low-Income Housing Units, which had the weakest correlation.
