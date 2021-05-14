@@ -9,4 +9,5 @@ https://www.huduser.gov/portal/datasets/lihtc/property.html (HUD)
 
 **DATA-205-Capstone-Project.Rmd** - This is my final R file with all the up to date code.
 **DATA205 Final Presentation.pptx** - This is my final PowerPoint presentation.
+**DATA205 Final Report.docx** - This is my final report document.
 
